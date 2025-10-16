@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clavier Sauvak</title>
+<style>
+  body {
+    font-family: 'MS Sans Serif', sans-serif;
+    background: #008080;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .window {
+    width: 100%;
+    max-width: 500px;
+    background: #c0c0c0;
+    border: 2px solid #fff;
+    box-shadow: 2px 2px 0 #000;
+    padding: 10px;
+  }
+  .title-bar {
+    background: #000080;
+    color: white;
+    padding: 4px;
+    font-weight: bold;
+    text-align: center;
+  }
+  #inputText {
+    width: 100%;
+    height: 60px;
+    font-size: 24px;
+    text-align: left;
+    margin-bottom: 10px;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  .keyboard {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  .key {
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    text-align: center;
+    font-size: 24px;
+    padding: 10px 0;
+    user-select: none;
+    cursor: pointer;
+  }
+  .key:active {
+    border-style: inset;
+  }
+  .space {
+    grid-column: span 7;
+  }
+  .button-send {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    border: 2px outset #fff;
+    background: #c0c0c0;
+    cursor: pointer;
+  }
+  .button-send:active {
+    border-style: inset;
+  }
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="title-bar">Clavier Sauvak</div>
+  <textarea id="inputText" readonly placeholder="Tape ici avec le clavier Sauvak..."></textarea>
+
+  <div class="keyboard" id="keyboard"></div>
+
+  <button class="button-send" onclick="sendWhatsApp()">Envoyer via WhatsApp</button>
+</div>
+
+<script>
+  // Alphabet Sauvak tribale (illisible)
+  const sauvakAlphabet = {
+    A: 'ᚐ', B: 'ᛒ', C: 'ᚳ', D: 'ᛞ', E: 'ᛖ', F: 'ᚠ', G: 'ᚷ', H: 'ᚺ',
+    I: 'ᛁ', J: 'ᛃ', K: 'ᚴ', L: 'ᛚ', M: 'ᛗ', N: 'ᚾ', O: 'ᛟ', P: 'ᛈ',
+    Q: 'ᛩ', R: 'ᚱ', S: 'ᛋ', T: 'ᛏ', U: 'ᚢ', V: 'ᚡ', W: 'ᚹ', X: 'ᛪ',
+    Y: 'ᛇ', Z: 'ᛉ', ' ': ' '
+  };
+
+  const letters = Object.keys(sauvakAlphabet);
+  const keyboard = document.getElementById('keyboard');
+
+  // Création des touches Sauvak
+  letters.forEach(letter => {
+    const key = document.createElement('div');
+    key.className = 'key';
+    key.textContent = sauvakAlphabet[letter];
+    key.onclick = () => {
+      document.getElementById('inputText').value += sauvakAlphabet[letter];
+    };
+    keyboard.appendChild(key);
+  });
+
+  // Touche espace
+  const space = document.createElement('div');
+  space.className = 'key space';
+  space.textContent = '␣'; 
+  space.onclick = () => {
+    document.getElementById('inputText').value += ' ';
+  };
+  keyboard.appendChild(space);
+
+  // Touche backspace
+  const backspace = document.createElement('div');
+  backspace.className = 'key space';
+  backspace.textContent = '⌫';
+  backspace.onclick = () => {
+    let val = document.getElementById('inputText').value;
+    document.getElementById('inputText').value = val.slice(0, -1);
+  };
+  keyboard.appendChild(backspace);
+
+  // Conversion inverse : Sauvak → Français
+  function convertToFrench(input) {
+    let french = '';
+    for (let char of input) {
+      const entry = Object.entries(sauvakAlphabet).find(([k,v]) => v === char);
+      french += entry ? entry[0] : char;
+    }
+    return french;
+  }
+
+  // Envoi WhatsApp
+  function sendWhatsApp() {
+    const inputText = document.getElementById('inputText').value;
+    if (!inputText) {
+      alert("Tape un message avant d'envoyer !");
+      return;
+    }
+    const translation = convertToFrench(inputText);
+    const finalMessage = inputText + "\n(" + translation + ")";
+    const url = `https://wa.me/?text=${encodeURIComponent(finalMessage)}`;
+    window.open(url, '_blank');
+  }
+</script>
+</body>
+</html>
