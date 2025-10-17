@@ -16,7 +16,7 @@
   }
   .window {
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
     background: #c0c0c0;
     border: 2px solid #fff;
     box-shadow: 2px 2px 0 #000;
@@ -31,12 +31,13 @@
   }
   #inputText {
     width: 100%;
-    height: 60px;
+    height: 70px;
     font-size: 24px;
-    text-align: left;
     margin-bottom: 10px;
     padding: 5px;
     box-sizing: border-box;
+    background: #fff;
+    border: 2px inset #aaa;
   }
   .keyboard {
     display: grid;
@@ -58,17 +59,22 @@
   .space {
     grid-column: span 7;
   }
-  .button-send {
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     margin-top: 10px;
-    width: 100%;
-    padding: 10px;
-    font-weight: bold;
-    font-size: 18px;
-    border: 2px outset #fff;
+    gap: 5px;
+  }
+  .button {
     background: #c0c0c0;
+    border: 2px outset #fff;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: bold;
     cursor: pointer;
   }
-  .button-send:active {
+  .button:active {
     border-style: inset;
   }
 </style>
@@ -76,15 +82,24 @@
 <body>
 <div class="window">
   <div class="title-bar">Clavier Sauvak</div>
+
   <textarea id="inputText" readonly placeholder="Tape ici avec le clavier Sauvak..."></textarea>
 
   <div class="keyboard" id="keyboard"></div>
 
-  <button class="button-send" onclick="sendWhatsApp()">Envoyer via WhatsApp</button>
+  <div class="buttons">
+    <button class="button" onclick="share('whatsapp')">WhatsApp</button>
+    <button class="button" onclick="share('telegram')">Telegram</button>
+    <button class="button" onclick="share('signal')">Signal</button>
+    <button class="button" onclick="share('twitter')">Twitter</button>
+    <button class="button" onclick="share('facebook')">Facebook</button>
+    <button class="button" onclick="share('instagram')">Instagram</button>
+    <button class="button" onclick="share('email')">E-mail</button>
+  </div>
 </div>
 
 <script>
-  // Alphabet Sauvak tribale (illisible)
+  // Alphabet Sauvak tribal
   const sauvakAlphabet = {
     A: 'ᚐ', B: 'ᛒ', C: 'ᚳ', D: 'ᛞ', E: 'ᛖ', F: 'ᚠ', G: 'ᚷ', H: 'ᚺ',
     I: 'ᛁ', J: 'ᛃ', K: 'ᚴ', L: 'ᛚ', M: 'ᛗ', N: 'ᚾ', O: 'ᛟ', P: 'ᛈ',
@@ -95,7 +110,7 @@
   const letters = Object.keys(sauvakAlphabet);
   const keyboard = document.getElementById('keyboard');
 
-  // Création des touches Sauvak
+  // Génération du clavier Sauvak
   letters.forEach(letter => {
     const key = document.createElement('div');
     key.className = 'key';
@@ -115,7 +130,7 @@
   };
   keyboard.appendChild(space);
 
-  // Touche backspace
+  // Touche effacement
   const backspace = document.createElement('div');
   backspace.className = 'key space';
   backspace.textContent = '⌫';
@@ -125,7 +140,7 @@
   };
   keyboard.appendChild(backspace);
 
-  // Conversion inverse : Sauvak → Français
+  // Conversion inverse Sauvak -> lettres latines
   function convertToFrench(input) {
     let french = '';
     for (let char of input) {
@@ -135,18 +150,47 @@
     return french;
   }
 
-  // Envoi WhatsApp
-  function sendWhatsApp() {
+  // Partage multi-réseaux
+  function share(platform) {
     const inputText = document.getElementById('inputText').value;
     if (!inputText) {
-      alert("Tape un message avant d'envoyer !");
+      alert("Tape un message avant de partager !");
       return;
     }
+
     const translation = convertToFrench(inputText);
     const finalMessage = inputText + "\n(" + translation + ")";
-    const url = `https://wa.me/?text=${encodeURIComponent(finalMessage)}`;
+    const encoded = encodeURIComponent(finalMessage);
+    let url = "";
+
+    switch(platform) {
+      case 'whatsapp':
+        url = `https://wa.me/?text=${encoded}`;
+        break;
+      case 'telegram':
+        url = `https://t.me/share/url?url=&text=${encoded}`;
+        break;
+      case 'signal':
+        url = `sgnl://send?text=${encoded}`;
+        break;
+      case 'twitter':
+        url = `https://twitter.com/intent/tweet?text=${encoded}`;
+        break;
+      case 'facebook':
+        url = `https://www.facebook.com/sharer/sharer.php?u=&quote=${encoded}`;
+        break;
+      case 'instagram':
+        navigator.clipboard.writeText(finalMessage);
+        alert("Message Sauvak copié pour Instagram !");
+        return;
+      case 'email':
+        url = `mailto:?subject=Message Sauvak&body=${encoded}`;
+        break;
+    }
     window.open(url, '_blank');
   }
 </script>
 </body>
 </html>
+
+
