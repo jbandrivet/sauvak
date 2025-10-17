@@ -90,9 +90,8 @@
   <div class="buttons">
     <button class="button" onclick="share('whatsapp')">WhatsApp</button>
     <button class="button" onclick="share('telegram')">Telegram</button>
-    <button class="button" onclick="share('signal')">Signal</button>
+    <button class="button" onclick="share('messenger')">Messenger</button>
     <button class="button" onclick="share('twitter')">Twitter</button>
-    <button class="button" onclick="share('facebook')">Facebook</button>
     <button class="button" onclick="share('instagram')">Instagram</button>
     <button class="button" onclick="share('email')">E-mail</button>
   </div>
@@ -140,7 +139,7 @@
   };
   keyboard.appendChild(backspace);
 
-  // Conversion inverse Sauvak -> lettres latines
+  // Conversion inverse Sauvak -> latin
   function convertToFrench(input) {
     let french = '';
     for (let char of input) {
@@ -170,14 +169,11 @@
       case 'telegram':
         url = `https://t.me/share/url?url=&text=${encoded}`;
         break;
-      case 'signal':
-        url = `sgnl://send?text=${encoded}`;
+      case 'messenger':
+        url = `https://www.facebook.com/dialog/send?link=https://example.com&app_id=87741124305&redirect_uri=https://facebook.com&quote=${encoded}`;
         break;
       case 'twitter':
         url = `https://twitter.com/intent/tweet?text=${encoded}`;
-        break;
-      case 'facebook':
-        url = `https://www.facebook.com/sharer/sharer.php?u=&quote=${encoded}`;
         break;
       case 'instagram':
         navigator.clipboard.writeText(finalMessage);
@@ -192,5 +188,6 @@
 </script>
 </body>
 </html>
+
 
 
