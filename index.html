@@ -108,15 +108,14 @@
 
   const letters = Object.keys(sauvakAlphabet);
   const keyboard = document.getElementById('keyboard');
+  const input = document.getElementById('inputText');
 
   // Génération du clavier Sauvak
   letters.forEach(letter => {
     const key = document.createElement('div');
     key.className = 'key';
     key.textContent = sauvakAlphabet[letter];
-    key.onclick = () => {
-      document.getElementById('inputText').value += sauvakAlphabet[letter];
-    };
+    key.onclick = () => input.value += sauvakAlphabet[letter];
     keyboard.appendChild(key);
   });
 
@@ -124,26 +123,21 @@
   const space = document.createElement('div');
   space.className = 'key space';
   space.textContent = '␣'; 
-  space.onclick = () => {
-    document.getElementById('inputText').value += ' ';
-  };
+  space.onclick = () => input.value += ' ';
   keyboard.appendChild(space);
 
   // Touche effacement
   const backspace = document.createElement('div');
   backspace.className = 'key space';
   backspace.textContent = '⌫';
-  backspace.onclick = () => {
-    let val = document.getElementById('inputText').value;
-    document.getElementById('inputText').value = val.slice(0, -1);
-  };
+  backspace.onclick = () => input.value = input.value.slice(0, -1);
   keyboard.appendChild(backspace);
 
-  // Conversion inverse Sauvak -> latin
+  // Conversion inverse Sauvak -> lettres latines
   function convertToFrench(input) {
     let french = '';
     for (let char of input) {
-      const entry = Object.entries(sauvakAlphabet).find(([k,v]) => v === char);
+      const entry = Object.entries(sauvakAlphabet).find(([k, v]) => v === char);
       french += entry ? entry[0] : char;
     }
     return french;
@@ -151,18 +145,18 @@
 
   // Partage multi-réseaux
   function share(platform) {
-    const inputText = document.getElementById('inputText').value;
-    if (!inputText) {
+    const text = input.value.trim();
+    if (!text) {
       alert("Tape un message avant de partager !");
       return;
     }
 
-    const translation = convertToFrench(inputText);
-    const finalMessage = inputText + "\n(" + translation + ")";
-    const encoded = encodeURIComponent(finalMessage);
+    const translation = convertToFrench(text);
+    const message = text + "\n(" + translation + ")";
+    const encoded = encodeURIComponent(message);
     let url = "";
 
-    switch(platform) {
+    switch (platform) {
       case 'whatsapp':
         url = `https://wa.me/?text=${encoded}`;
         break;
@@ -170,24 +164,28 @@
         url = `https://t.me/share/url?url=&text=${encoded}`;
         break;
       case 'messenger':
-        url = `https://www.facebook.com/dialog/send?link=https://example.com&app_id=87741124305&redirect_uri=https://facebook.com&quote=${encoded}`;
+        url = `fb-messenger://share?text=${encoded}`;
         break;
       case 'twitter':
         url = `https://twitter.com/intent/tweet?text=${encoded}`;
         break;
       case 'instagram':
-        navigator.clipboard.writeText(finalMessage);
+        navigator.clipboard.writeText(message);
         alert("Message Sauvak copié pour Instagram !");
+        input.value = '';
         return;
       case 'email':
         url = `mailto:?subject=Message Sauvak&body=${encoded}`;
         break;
     }
+
     window.open(url, '_blank');
+    input.value = ''; // Efface après envoi
   }
 </script>
 </body>
 </html>
+
 
 
 
